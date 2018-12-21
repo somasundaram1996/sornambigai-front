@@ -1,0 +1,9 @@
+#formContainer{
+    margin:20%;
+    position: relative;
+    height:100%;
+    background-color:blanchedalmond;
+}
+#particles-js{
+    height:100%;
+}
