@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {LoginService} from './login.service';
+import { ToasterService } from '../toaster.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -8,12 +9,12 @@ import {LoginService} from './login.service';
 })
 
 export class LoginComponent implements OnInit {
-  userName:string="vijay";
+  userName:string;
   passWord:string;
   Password_p:string="Password";
   Username_p:string="User Name";
   
-  constructor(private _service:LoginService) { }
+  constructor(private _service: LoginService, private toaster: ToasterService) { }
 
   changeOutUFocus(){
     this.Username_p="User Name";
@@ -32,6 +33,7 @@ export class LoginComponent implements OnInit {
   }
   onClickSubmit(event){
     const param={'userName':this.userName,'password':this.passWord}
-    this._service.checkUserId(param);
+    //this._service.checkUserId(param);
+    this.toaster.success("Logged in");
   }
 }
