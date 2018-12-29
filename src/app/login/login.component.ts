@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {LoginService} from './login.service';
 import { ToasterService } from '../toaster.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -13,8 +14,9 @@ export class LoginComponent implements OnInit {
   passWord:string;
   Password_p:string="Password";
   Username_p:string="User Name";
-  
-  constructor(private _service: LoginService, private toaster: ToasterService) { }
+  constructor(private _service: LoginService, private toaster: ToasterService,private _router:Router) {
+
+   }
 
   changeOutUFocus(){
     this.Username_p="User Name";
@@ -30,10 +32,22 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+  
   }
-  onClickSubmit(event){
-    const param={'userName':this.userName,'password':this.passWord}
-    //this._service.checkUserId(param);
-    this.toaster.success("Logged in");
+  onClickSubmit(event){ 
+    const params ={"email-id":this.userName,"password":this.passWord};
+    if(this.userName==undefined){
+      this.toaster.error("Please Check your User Name or Password");
+    } else {
+    this._service.getUsers(params).subscribe(result=>{
+      if(result!=null){
+        this._router.navigateByUrl("home");
+      } else {
+        this.toaster.error("Please Check your User Name or Password");
+      }
+    });  
   }
+  }  
+
+  
 }

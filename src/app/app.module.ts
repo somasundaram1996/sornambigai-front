@@ -6,14 +6,23 @@ import {FormsModule} from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import {HttpClientModule} from '@angular/common/http'
 import { ToasterService } from './toaster.service';
+import { HomeComponent } from './home/home.component';
+import { AddJewellComponent } from './add-jewell/add-jewell.component';
+import { CalculateBillComponent } from './calculate-bill/calculate-bill.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  {path:'home',component:HomeComponent},
+  {path:"addJewell",component:AddJewellComponent},
+  {path:"calculateBill",component:CalculateBillComponent},
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ]
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    HomeComponent,
+    AddJewellComponent,
+    CalculateBillComponent
   ],
   imports: [
     BrowserModule, 
