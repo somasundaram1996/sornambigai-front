@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ToasterService } from '../toaster.service';
 
 @Component({
   selector: 'app-home',
@@ -8,9 +9,9 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private _router:Router) { }
-
+  constructor(private _router:Router,private _toaster:ToasterService) { }
   ngOnInit() {
+   
   }
   addJewell(){
     this._router.navigate(["addJewell"],{});

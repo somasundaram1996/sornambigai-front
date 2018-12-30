@@ -14,7 +14,7 @@ export class LoginComponent implements OnInit {
   passWord:string;
   Password_p:string="Password";
   Username_p:string="User Name";
-  constructor(private _service: LoginService, private toaster: ToasterService,private _router:Router) {
+  constructor(private _service: LoginService, private _toaster: ToasterService,private _router:Router) {
 
    }
 
@@ -37,13 +37,13 @@ export class LoginComponent implements OnInit {
   onClickSubmit(event){ 
     const params ={"email-id":this.userName,"password":this.passWord};
     if(this.userName==undefined){
-      this.toaster.error("Please Check your User Name or Password");
+      this._toaster.error("Error","Please Check your User Name or Password");
     } else {
     this._service.getUsers(params).subscribe(result=>{
-      if(result!=null){
+      if(result){
         this._router.navigateByUrl("home");
       } else {
-        this.toaster.error("Please Check your User Name or Password");
+        this._toaster.error("Error","Please Check your User Name or Password");
       }
     });  
   }

@@ -8,18 +8,18 @@ export class ToasterService {
   constructor() {
     toastr.settings=this.settings();
    }
-  success(title:string,message?:string){
+  success(message:string,title?:string){
     toastr.success(title,message);
   }
 
-  warning(title:string,message?:string){
+  warning(message:string,title?:string){
     toastr.warning(title,message);
   }
 
-  error(title:string,message?:string){
+  error(message:string,title?:string){
     toastr.error(title,message);
   }
-  info(title:string,message:string){
+  info(message:string,title?:string){
     toastr.info(title,message);
   }
 settings(){

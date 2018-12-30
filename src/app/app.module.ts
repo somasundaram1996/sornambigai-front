@@ -11,9 +11,10 @@ import { AddJewellComponent } from './add-jewell/add-jewell.component';
 import { CalculateBillComponent } from './calculate-bill/calculate-bill.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  {path:'home',component:HomeComponent},
-  {path:"addJewell",component:AddJewellComponent},
-  {path:"calculateBill",component:CalculateBillComponent},
+  {path:'home',component:HomeComponent,children:[
+    {path:"addJewell",component:AddJewellComponent},
+    {path:"calculateBill",component:CalculateBillComponent}
+  ]},
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ]
 @NgModule({
