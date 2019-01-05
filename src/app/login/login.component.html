@@ -10,8 +10,9 @@
           <label>Password</label><br>
           <input type="password" class="form-control" (focusout)="changeOutPFocus()"(focus)="changeInPFocus()"[placeholder]="Password_p" name = "passWord" [(ngModel)]="passWord">
         </div>
-        <input type="submit" class="btn btn-primary btn-block" (click)="onClickSubmit($event)">
+        <input type="submit" class="btn btn-primary btn-block navColor" (click)="onClickSubmit($event)">
             </form>
     </section>
   </section>
 </section>
+<div *ngIf="isLoading" class="spinner"></div>

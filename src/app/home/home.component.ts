@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToasterService } from '../toaster.service';
-
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -10,9 +9,15 @@ import { ToasterService } from '../toaster.service';
 export class HomeComponent implements OnInit {
 
   constructor(private _router:Router,private _toaster:ToasterService) { }
-  ngOnInit() {
-   
+  logOut(){
+      localStorage.setItem("isLoggedIn","false");
+      this._router.navigateByUrl("login");
   }
+  ngOnInit() {
+    if(localStorage.getItem("isLoggedIn")=="false"||localStorage.length==1){
+      this._router.navigateByUrl("login");
+    }
+   }
   addJewell(){
     this._router.navigate(["addJewell"],{});
   }
