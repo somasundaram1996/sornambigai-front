@@ -8,16 +8,16 @@ export class AddJewellService{
     constructor(private _http:HttpClient){}
     base:Base= new Base();
     loadItems(param):Observable<any>{
-        return this._http.post(this.base.getBaseUrl()+"/getItems",param);
+        return this._http.post(this.base.getBaseUrl()+"/auth/getItems",param);
     }
 
     getItemCategories():Observable<any>{
-        return this._http.post(this.base.getBaseUrl()+"/getItemCategories",{});
+        return this._http.post(this.base.getBaseUrl()+"/auth/getItemCategories",{});
     }
     getSubtypeDetails():Observable<any>{
-        return this._http.post(this.base.getBaseUrl()+"/getSubtypeDetails",{});
+        return this._http.post(this.base.getBaseUrl()+"/auth/getSubtypeDetails",{});
     }
     getDealerDetails():Observable<any>{
-        return this._http.post(this.base.getBaseUrl()+"/getDealerDetails",{});
+        return this._http.post(this.base.getBaseUrl()+"/auth/getDealerDetails",{});
     }
 }

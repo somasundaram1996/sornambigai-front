@@ -10,13 +10,10 @@ export class HomeComponent implements OnInit {
 
   constructor(private _router:Router,private _toaster:ToasterService) { }
   logOut(){
-      localStorage.setItem("isLoggedIn","false");
+      sessionStorage.removeItem("jwtToken");
       this._router.navigateByUrl("login");
   }
   ngOnInit() {
-    if(localStorage.getItem("isLoggedIn")=="false"||localStorage.length==1){
-      this._router.navigateByUrl("login");
-    }
    }
   addJewell(){
     this._router.navigate(["addJewell"],{});
