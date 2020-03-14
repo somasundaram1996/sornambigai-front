@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { ToasterService } from '../toaster.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -8,10 +8,13 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private _router:Router) { }
-
-  ngOnInit() {
+  constructor(private _router:Router,private _toaster:ToasterService) { }
+  logOut(){
+      sessionStorage.removeItem("jwtToken");
+      this._router.navigateByUrl("login");
   }
+  ngOnInit() {
+   }
   addJewell(){
     this._router.navigate(["addJewell"],{});
   }

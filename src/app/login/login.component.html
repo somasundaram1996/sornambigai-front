@@ -3,15 +3,22 @@
     <section class="col-12 col-sm-6 col-md-3">
       <form class="form-container">
         <div class="form-group">
-          <label for="userName">User Name</label><br>
-          <input type="email" class="form-control" name = "userName" [placeholder]="Username_p" (focusout)="changeOutUFocus()" (focus)="changeInUFocus()" [(ngModel)]="userName">
+          <label for="userName">Email ID</label><br>
+          <input type="email" class="form-control" name = "userName" [placeholder]="emailId_p" (focusout)="changeOutEFocus()" (focus)="changeInEFocus()" [(ngModel)]="emailId">
+        </div>
+        <div  *ngIf = "signingUp"class="form-group" id="user-name-container">
+          <label>User Name</label><br>
+          <input type="text" class="form-control" (focusout)="changeOutPFocus()"(focus)="changeInPFocus()"[placeholder]="Username_p" name = "passWord" [(ngModel)]="userName">
         </div>
         <div  class="form-group" id="user-name-container">
           <label>Password</label><br>
           <input type="password" class="form-control" (focusout)="changeOutPFocus()"(focus)="changeInPFocus()"[placeholder]="Password_p" name = "passWord" [(ngModel)]="passWord">
         </div>
-        <input type="submit" class="btn btn-primary btn-block" (click)="onClickSubmit($event)">
+        <input type="submit" *ngIf="!signingUp"class="btn btn-primary btn-block navColor" (click)="onClickSubmit($event)" value="Sign In">
+        <input type="button" *ngIf="!signingUp" class="btn btn-block btn-primary navColor" (click)="changeView()" value="Sign Up">
+        <input *ngIf = "signingUp" type="button" class="btn btn-block btn-primary navColor" (click)="addUser()" value="Sign Up">
             </form>
     </section>
   </section>
 </section>
+<div *ngIf="isLoading" class="spinner"></div>
