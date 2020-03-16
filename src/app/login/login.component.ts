@@ -56,6 +56,9 @@ export class LoginComponent implements OnInit{
       this._service.addUser(params).subscribe(result =>{
         if(result){
           this._toaster.info("Info","User added Successfully");
+          this.passWord="";
+          this.userName="";
+          this.emailId="";
         } else {
           this._toaster.error('Error',"User already Existing Choose Another Email");
           this.passWord="";
