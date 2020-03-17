@@ -1,7 +1,7 @@
 <section class="container-fluid bg">
     <section class="row justify-content-center">
       <section class="col-12 col-sm-6 col-md-3">
-        <form class="form-container" name="addJewellForm">
+        <form class="form-container" [class.deleteColor]="exitingItemTab" name="addJewellForm">
           <div class="form-group">
             <ul class="nav nav-pills nav-fill poi">
               <li class="nav-item">
@@ -18,19 +18,18 @@
             </select>
             <mat-form-field class="example-full-width">
               <input matInput name="itemCategoryName" type="text" 
-              class="form-control" placeholder="Enter Item Name"
+              class="form-control" placeholder="Item Name"
               aria-label="Item Name"  [(ngModel)]="itemName" required>
             </mat-form-field>
             <input style="margin-top: 12px;"name="itemCategoryName" value="Add Item" type="submit" class="btn btn-primary btn-block navColor" (click)="addItem($event)">
           </div>
           <div *ngIf="exitingItemTab">
             <label for="itemCategory">Item Category</label><br>
-            <select name="existTabItemCategoryName" class="form-control poi" (change)="loadDisplayItems()" name = "itemCategory" [(ngModel)]="itemCategory">
+            <select name="existTabItemCategoryName" class="form-control poi" (change)="loadDisplayItems('')" name = "itemCategory" [(ngModel)]="itemCategory">
                 <option  class="dropdown-item"  value="{{item.itemCategoryId}}" *ngFor = "let item of itemCategoryTable">{{item.itemCategoryName}}</option>
             </select>
-            <label>Existing Item Name</label><br>
             <mat-form-field class="example-full-width">
-              <input (blur)="clearIfInvalid()" class="form-control" matInput
+              <input  class="form-control" matInput
                      placeholder="Item Name"
                      aria-label="Item Name"
                      [matAutocomplete]="auto"

@@ -19,4 +19,8 @@ export class AddJewellService{
     addItem(params):Observable<any> {
         return this._http.post(this.base.getBaseUrl()+'/auth/addItem',params);
     }
+
+    deleteItem(params):Observable<any> {
+        return this._http.post(this.base.getBaseUrl()+'/auth/deleteItem',params);
+    }
 }

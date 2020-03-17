@@ -1,10 +1,11 @@
+import { ConfirmationDialogComponent } from './../common-component/confirmation-dialog/confirmation-dialog.component';
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { AddJewellService } from './add-jewell.service';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { ToasterService } from '../toaster.service';
 import { FormControl } from '@angular/forms';
-import { startWith, map, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material';
+import { startWith, map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatDialog } from '@angular/material';
 export class ItemModel {
   itemId:number;
   itemName:string;
@@ -20,7 +21,7 @@ export class AddJewellComponent implements OnInit {
   itemCategoryArray:string[];
   itemCategoryTable:any[];
   isValid:boolean = true;
-  items:any[] =[{'itemId': 0,'itemName':'No Data found'}];
+  items:any[] = [];
   itemCategory:string;
   itemName: string;
   itemToBeDelted:string;
@@ -33,11 +34,12 @@ export class AddJewellComponent implements OnInit {
   subscription: Subscription;
   @ViewChild('newItemTab') newItemTabRef: ElementRef<any>;
   @ViewChild('existingItemTab') existingItemTabRef: ElementRef<any>;
-  constructor(private _service:AddJewellService,private toasterService: ToasterService) { 
+  constructor(private _service:AddJewellService,private toasterService: ToasterService,
+    public dialog: MatDialog) { 
     this.filteredItems = this.itemControl.valueChanges
-    .pipe(debounceTime(500),distinctUntilChanged(),
+    .pipe(
       startWith(''),
-      map(state => state ?  this._filterItem(state) : this.items.slice())
+      map(state => this._filterItem(state))
     );
   }
 
@@ -50,17 +52,12 @@ export class AddJewellComponent implements OnInit {
     }
     
     if(typeof(value)==='string') {
-      return this.loadDisplayItems(filterValue);
+      this.isValid = this.items.filter(item => item.itemName === filterValue).length > 0;
+      return this.items.filter(item => item.itemName.toLowerCase().indexOf(filterValue) === 0);
     } else {
       return [];
     }
     
-  }
-
-  clearIfInvalid() {
-    if(!this.isValid) {
-      this.itemControl.setValue('');
-    }
   }
 
   loadGoldCategory(){
@@ -91,38 +88,65 @@ export class AddJewellComponent implements OnInit {
       const params = {'itemCategoryId':this.itemCategory,'itemName':this.itemName}
       this._service.addItem(params).subscribe(result =>{
         if(result){
-          this.toasterService.info('Info','Item Added Successfully');
+          this.toasterService.success('Info','Item Added Successfully');
           this.itemName="";
         }
       });
     }
   }
 
-  deleteItem(itemName) {
-    alert(this.itemControl.value);
+  deleteItem(itemId) {
+    if(!this.items.find(item => item.itemId === this.itemControl.value)) {
+      this.itemControl.patchValue('');
+      this.toasterService.error('Error','Enter valid Element');
+      return;
+    }
+    if(this.itemControl.value) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent,{
+        width:'250px',
+        data:{content: 'Are you sure you want to delete ' + this.getDisplayName(this.itemControl.value) +'?'}
+      });
+      dialogRef.afterClosed().subscribe(confirmation => {
+        if(confirmation === 'Yes'){
+        this._service.deleteItem({'itemId':''+ this.itemControl.value}).subscribe(result =>{
+          if(result){
+            this.toasterService.success('Info','Item Deleted');
+            this.loadDisplayItems('');
+          } else {
+            this.toasterService.error('Error','Item Not Delted!!!');
+          }
+        });
+      }
+      });
+    } else {
+      this.toasterService.error('Error','Please Select an Item');
+    }
   }
-  loadDisplayItems(keyword): ItemModel[]{
+  loadDisplayItems(keyword){
     const param ={'itemCategoryId':this.itemCategory,'keyword':keyword}
       this._service.loadItems(param).subscribe(items =>{
         if(items.length > 0){
           this.items = items;
-          this.isValid = this.items.filter(item => item.itemName === keyword).length > 0;
         } else {
-          this.items = [{'itemId': 0,'itemName':'No Data found'}];
+          this.items =[];
           this.isValid = false;
         }
         this.itemControl.markAsTouched();
-        if(keyword){
-          this.itemControl.patchValue(keyword);
-        } else {
-          this.itemControl.patchValue('');
-        }
+        this.itemControl.patchValue('');
       });
-      return this.items;
+  }
+
+  clearIfInvalid(){
+    if(!this.items.find(item => item.itemId === this.itemControl.value)) {
+      this.itemControl.patchValue('');
+    }
   }
 
   getDisplayName(itemId) {
     if(!itemId) {
+      return "";
+    }
+    if(typeof(itemId)!=='number'){
       return "";
     }
     return this.items.find(item => item.itemId === itemId).itemName;
