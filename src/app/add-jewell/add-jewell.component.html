@@ -29,7 +29,7 @@
                 <option  class="dropdown-item"  value="{{item.itemCategoryId}}" *ngFor = "let item of itemCategoryTable">{{item.itemCategoryName}}</option>
             </select>
             <mat-form-field class="example-full-width">
-              <input  class="form-control" matInput
+              <input matInput
                      placeholder="Item Name"
                      aria-label="Item Name"
                      [matAutocomplete]="auto"

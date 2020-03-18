@@ -1,7 +1,7 @@
 import { ConfirmationDialogComponent } from './../common-component/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material';
-import { Component, OnInit, Inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { ToasterService } from '../toaster.service';
 import { MediaMatcher } from '@angular/cdk/layout';
 @Component({
@@ -38,10 +38,12 @@ export class HomeComponent implements OnDestroy {
   logout() {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent,{
       width:'250px',
-      data:{content:'Confirm Logout?'}
+      data:{
+        content:'Confirm Logout?'
+      }
     });
-    dialogRef.afterClosed().subscribe(result =>{
-      if(result === 'Yes') {
+    dialogRef.afterClosed().subscribe(confirmation =>{
+      if(confirmation) {
         sessionStorage.removeItem("jwtToken");
         this.toaster.success('Info','Logged Out Successfully');
         this.router.navigateByUrl('/login');

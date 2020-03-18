@@ -2,6 +2,6 @@
     <mat-label>{{data.content}}</mat-label>
 </div>
 <div mat-dialog-actions>
-  <button mat-raised-button (click)="onNoClick($event)">No</button>
-  <button mat-raised-button color="warn" (click)="onNoClick($event)" cdkFocusInitial>Yes</button>
+  <button mat-raised-button (click)="onNoClick(false)">No</button>
+  <button mat-raised-button color="{{data.type? data.type : 'primary'}}" (click)="onNoClick(true)" cdkFocusInitial>Yes</button>
 </div>

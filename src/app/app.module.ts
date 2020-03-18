@@ -21,13 +21,14 @@ import { MatSidenavModule} from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmationDialogComponent } from './common-component/confirmation-dialog/confirmation-dialog.component';
-import { MatDialogModule, MatAccordion, MatExpansionModule, MatTooltipModule } from '@angular/material';
+import { MatDialogModule, MatExpansionModule, MatTooltipModule } from '@angular/material';
 import { PriceChangeComponent } from './price-change/price-change.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   {path:'home',component:HomeComponent,children:[
     {path:"addJewell",component:AddJewellComponent},
-    {path:"calculateBill",component:CalculateBillComponent}
+    {path:"calculateBill",component:CalculateBillComponent},
+    {path:'updatePrice',component:PriceChangeComponent}
   ]},
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ]

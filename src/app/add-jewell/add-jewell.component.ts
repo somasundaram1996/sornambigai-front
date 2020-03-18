@@ -1,11 +1,11 @@
 import { ConfirmationDialogComponent } from './../common-component/confirmation-dialog/confirmation-dialog.component';
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AddJewellService } from './add-jewell.service';
 import { forkJoin, Observable, Subscription } from 'rxjs';
 import { ToasterService } from '../toaster.service';
 import { FormControl } from '@angular/forms';
-import { startWith, map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatDialog } from '@angular/material';
+import { startWith, map } from 'rxjs/operators';
+import { MatDialog } from '@angular/material';
 export class ItemModel {
   itemId:number;
   itemName:string;
@@ -43,6 +43,18 @@ export class AddJewellComponent implements OnInit {
     );
   }
 
+  
+
+  ngOnInit() {
+    forkJoin(this._service.getItemCategories()).subscribe(res=>{
+      this.itemCategoryTable=res[0];
+      this.itemCategoryArray=this.itemCategoryTable.map(itemCategory=>itemCategory.itemCategoryName);
+      this.itemCategoryArray=Array.from(new Set(this.itemCategoryArray));
+      this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
+      this.newItemTabRef.nativeElement.classList.add('active');
+    });
+  }
+
   private _filterItem(value: string): ItemModel[]  {
     let filterValue = ''
     if(value && typeof(value) === 'string'){
@@ -60,9 +72,6 @@ export class AddJewellComponent implements OnInit {
     
   }
 
-  loadGoldCategory(){
-
-  }
   changeActiveTab(tabName){
     if(tabName ==='newTab') {
       this.newItemTabRef.nativeElement.classList.add('active');
@@ -104,10 +113,13 @@ export class AddJewellComponent implements OnInit {
     if(this.itemControl.value) {
       const dialogRef = this.dialog.open(ConfirmationDialogComponent,{
         width:'250px',
-        data:{content: 'Are you sure you want to delete ' + this.getDisplayName(this.itemControl.value) +'?'}
+        data:{
+          content: 'Are you sure you want to delete ' + this.getDisplayName(this.itemControl.value) +'?',
+          type: 'warn'
+        }
       });
       dialogRef.afterClosed().subscribe(confirmation => {
-        if(confirmation === 'Yes'){
+        if(confirmation){
         this._service.deleteItem({'itemId':''+ this.itemControl.value}).subscribe(result =>{
           if(result){
             this.toasterService.success('Info','Item Deleted');
@@ -122,6 +134,7 @@ export class AddJewellComponent implements OnInit {
       this.toasterService.error('Error','Please Select an Item');
     }
   }
+  
   loadDisplayItems(keyword){
     const param ={'itemCategoryId':this.itemCategory,'keyword':keyword}
       this._service.loadItems(param).subscribe(items =>{
@@ -150,16 +163,6 @@ export class AddJewellComponent implements OnInit {
       return "";
     }
     return this.items.find(item => item.itemId === itemId).itemName;
-  }
-
-  ngOnInit() {
-    forkJoin(this._service.getItemCategories()).subscribe(res=>{
-      this.itemCategoryTable=res[0];
-      this.itemCategoryArray=this.itemCategoryTable.map(itemCategory=>itemCategory.itemCategoryName);
-      this.itemCategoryArray=Array.from(new Set(this.itemCategoryArray));
-      this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
-      this.newItemTabRef.nativeElement.classList.add('active');
-    });
   }
 
 }

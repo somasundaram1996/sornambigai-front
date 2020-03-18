@@ -1,7 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export interface DialogData {
   content:string;
+  type:string;
 }
 
 @Component({
@@ -17,8 +18,8 @@ export class ConfirmationDialogComponent {
       console.log(data);
     }
 
-  onNoClick(clickEvent): void {
-    this.dialogRef.close(clickEvent.currentTarget.innerText);
+  onNoClick(confirmation): void {
+    this.dialogRef.close(confirmation);
   }
 
 }
