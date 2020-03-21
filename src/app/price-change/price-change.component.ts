@@ -17,7 +17,8 @@ export class ItemModel {
 })
 export class PriceChangeComponent implements OnInit{
   itemCategoryArray:string[];
-  itemCategoryTable:any[];  
+  itemCategoryTable:any[]; 
+  isLoading:boolean = true; 
   itemCategory:string;
   itemPrice: number;
   
@@ -41,7 +42,9 @@ export class PriceChangeComponent implements OnInit{
       dialogRef.afterClosed().subscribe(confirmation => {
         if(confirmation) {
           const param ={'itemCategoryId': this.itemCategory,'pricePerGram': this.itemPrice};
+          this.isLoading = true;
           this._service.updatePrice(param).subscribe(result => {
+            this.isLoading = false;
             if(result) {
               this.toasterService.success('Info','Price Updated Successfully');
               this.itemPrice = null;
@@ -70,6 +73,7 @@ export class PriceChangeComponent implements OnInit{
       this.itemCategoryTable=res[0];
       this.itemCategoryArray=this.itemCategoryTable.map(itemCategory=>itemCategory.itemCategoryName);
       this.itemCategoryArray=Array.from(new Set(this.itemCategoryArray));
+      this.isLoading = false;
       this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
     });
   }

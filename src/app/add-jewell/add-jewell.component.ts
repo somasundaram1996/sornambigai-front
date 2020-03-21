@@ -20,6 +20,7 @@ export class AddJewellComponent implements OnInit {
 
   itemCategoryArray:string[];
   itemCategoryTable:any[];
+  isLoading:boolean = true;
   isValid:boolean = true;
   items:any[] = [];
   itemCategory:string;
@@ -48,6 +49,7 @@ export class AddJewellComponent implements OnInit {
   ngOnInit() {
     forkJoin(this._service.getItemCategories()).subscribe(res=>{
       this.itemCategoryTable=res[0];
+      this.isLoading = false;
       this.itemCategoryArray=this.itemCategoryTable.map(itemCategory=>itemCategory.itemCategoryName);
       this.itemCategoryArray=Array.from(new Set(this.itemCategoryArray));
       this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
@@ -95,7 +97,9 @@ export class AddJewellComponent implements OnInit {
       
     } else {
       const params = {'itemCategoryId':this.itemCategory,'itemName':this.itemName}
+      this.isLoading = true;
       this._service.addItem(params).subscribe(result =>{
+        this.isLoading = false;
         if(result){
           this.toasterService.success('Info','Item Added Successfully');
           this.itemName="";
@@ -120,8 +124,10 @@ export class AddJewellComponent implements OnInit {
       });
       dialogRef.afterClosed().subscribe(confirmation => {
         if(confirmation){
+          this.isLoading = true;
         this._service.deleteItem({'itemId':''+ this.itemControl.value}).subscribe(result =>{
           if(result){
+            this.isLoading = false;
             this.toasterService.success('Info','Item Deleted');
             this.loadDisplayItems('');
           } else {
@@ -137,7 +143,9 @@ export class AddJewellComponent implements OnInit {
   
   loadDisplayItems(keyword){
     const param ={'itemCategoryId':this.itemCategory,'keyword':keyword}
+    this.isLoading = true;
       this._service.loadItems(param).subscribe(items =>{
+        this.isLoading = false;
         if(items.length > 0){
           this.items = items;
         } else {

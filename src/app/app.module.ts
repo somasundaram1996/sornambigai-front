@@ -21,7 +21,7 @@ import { MatSidenavModule} from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmationDialogComponent } from './common-component/confirmation-dialog/confirmation-dialog.component';
-import { MatDialogModule, MatExpansionModule, MatTooltipModule } from '@angular/material';
+import { MatDialogModule, MatExpansionModule, MatTooltipModule, MatProgressSpinnerModule, MatTableModule, MatCheckboxModule } from '@angular/material';
 import { PriceChangeComponent } from './price-change/price-change.component';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -59,7 +59,10 @@ const routes: Routes = [
     MatListModule,
     MatDialogModule,
     MatTooltipModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatCheckboxModule,
   ],
   entryComponents:[ConfirmationDialogComponent],
   providers: [ToasterService,LoginService, {

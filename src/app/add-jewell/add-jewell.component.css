@@ -15,6 +15,11 @@
 .example-full-width {
     width: 100%;
   }
+.spinner {
+    top:50%;
+    left:45%;
+    position: absolute;
+}
 .bg{
     background:url('../resources/common/images/addProduct.jpg') no-repeat;
     width:100%;
