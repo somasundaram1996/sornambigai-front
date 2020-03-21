@@ -1,7 +1,7 @@
 <section class="container-fluid bg">
   <section class="row justify-content-center">
     <section class="col-12 col-sm-6 col-md-3">
-      <form class="form-container">
+      <form class="form-container" >
         <div class="form-group">
           <label for="userName">Email ID</label><br>
           <input type="email" class="form-control" name = "userName" [placeholder]="emailId_p" (focusout)="changeOutEFocus()" (focus)="changeInEFocus()" [(ngModel)]="emailId">
@@ -21,4 +21,4 @@
     </section>
   </section>
 </section>
-<div *ngIf="isLoading" class="spinner"></div>
+<mat-spinner class="spinner"*ngIf="isLoading"></mat-spinner>

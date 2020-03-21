@@ -1,25 +1,57 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { ConfirmationDialogComponent } from './../common-component/confirmation-dialog/confirmation-dialog.component';
+import { MatDialog } from '@angular/material';
+import { Component, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToasterService } from '../toaster.service';
+import { MediaMatcher } from '@angular/cdk/layout';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnDestroy {
 
-  constructor(private _router:Router,private _toaster:ToasterService) { }
-  logOut(){
-      sessionStorage.removeItem("jwtToken");
-      this._router.navigateByUrl("login");
-  }
-  ngOnInit() {
-   }
-  addJewell(){
-    this._router.navigate(["addJewell"],{});
+  mobileQuery: MediaQueryList;
+  shouldRun = true;
+
+  fillerNav = [
+    {navName:'Add & Delete Jewell',navLink:'addJewell'}
+  ]
+
+  private _mobileQueryListener: () => void;
+
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+    private toaster: ToasterService,private router: Router, public dialog: MatDialog) {
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
   }
 
-  calculateBill(){
-    this._router.navigateByUrl("calculateBill");
+  navigateToPage(linkToPage) {
+    if(linkToPage.currentTarget.pathname  === '/logout') {
+      sessionStorage.removeItem('jwtToken');
+      this.router.navigateByUrl('/login');
+      this.toaster.info('Info','Logged Out!');
+    } 
+  }
+
+  logout() {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent,{
+      width:'250px',
+      data:{
+        content:'Confirm Logout?'
+      }
+    });
+    dialogRef.afterClosed().subscribe(confirmation =>{
+      if(confirmation) {
+        sessionStorage.removeItem("jwtToken");
+        this.toaster.success('Info','Logged Out Successfully');
+        this.router.navigateByUrl('/login');
+      }
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 }

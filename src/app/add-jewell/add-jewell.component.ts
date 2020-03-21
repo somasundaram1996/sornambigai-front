@@ -1,7 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { ConfirmationDialogComponent } from './../common-component/confirmation-dialog/confirmation-dialog.component';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { AddJewellService } from './add-jewell.service';
-import { forkJoin } from 'rxjs';
-
+import { forkJoin, Observable, Subscription } from 'rxjs';
+import { ToasterService } from '../toaster.service';
+import { FormControl } from '@angular/forms';
+import { startWith, map } from 'rxjs/operators';
+import { MatDialog } from '@angular/material';
+export class ItemModel {
+  itemId:number;
+  itemName:string;
+}
 @Component({
   selector: 'app-add-jewell',
   templateUrl: './add-jewell.component.html',
@@ -12,88 +20,157 @@ export class AddJewellComponent implements OnInit {
 
   itemCategoryArray:string[];
   itemCategoryTable:any[];
+  isLoading:boolean = true;
+  isValid:boolean = true;
+  items:any[] = [];
   itemCategory:string;
-  isGold:boolean = true;
-  goldCategoryType:string;
-  goldCategoryArray:string[];
-  subTypeTableArray:any[];
-  subTypeArray:string[];
-  subType:string;
-  dealerNameArray:string[];
-  dealerTableArray:any[];
-  dealerName:string;
-  quantity:number=1;
-  itemsTableArray:any[];  
-  itemsArray:string[];
-  isItemsEmpty:boolean=false;
-  selectedItem:string;
-  constructor(private _service:AddJewellService) { }
-
-  loadGoldCategory(){
-
+  itemName: string;
+  itemToBeDelted:string;
+  exitingItemTab:boolean= false;
+  disabled:boolean = false;
+  itemId:number;
+  itemControl = new FormControl();
+  filteredItems: Observable<ItemModel[]>;
+  
+  subscription: Subscription;
+  @ViewChild('newItemTab') newItemTabRef: ElementRef<any>;
+  @ViewChild('existingItemTab') existingItemTabRef: ElementRef<any>;
+  constructor(private _service:AddJewellService,private toasterService: ToasterService,
+    public dialog: MatDialog) { 
+    this.filteredItems = this.itemControl.valueChanges
+    .pipe(
+      startWith(''),
+      map(state => this._filterItem(state))
+    );
   }
 
-  loadDisplayItems(){
-    let goldCategoryId:string="";
-    let dealerId:string="";
-    let itemCategoryId:string="";
-    if(this.itemCategory=="Gold"){
-      this.isGold=true;
-      goldCategoryId=this.itemCategoryTable.filter(item=>item.itemCategoryName==this.itemCategory && item.goldCategoryName==this.goldCategoryType).map(item=>item.goldCategoryId).pop();
-    }else{
-      this.isGold=false;
-      goldCategoryId=this.itemCategoryTable.filter(item=>item.itemCategoryName==this.itemCategory && item.goldCategoryName).map(item=>item.goldCategoryId).pop();
-    }
-    itemCategoryId=this.itemCategoryTable.filter(item=>item.itemCategoryName==this.itemCategory).map(item=>item.itemCategoryId).pop();
-    dealerId=this.dealerTableArray.filter(dealer=>dealer.dealerName==this.dealerName).map(dealer=>dealer.dealerId).pop();
-    const param={"itemCategoryId":itemCategoryId,"dealerId":dealerId,"goldCategoryId":goldCategoryId};
-    this._service.loadItems(param).subscribe(items=>{
-      this.itemsTableArray=items;
-      this.itemsArray=items.map(item=>item.itemName);
-      this.selectedItem=this.itemsArray[0];
-      this.loadSubTypeId();
-    });
-    if(this.itemsArray.length==0 || this.itemCategory=="Silver"){
-      this.isItemsEmpty=true;
-    } else {
-      this.isItemsEmpty=false;
-    }
-  }
+  
 
   ngOnInit() {
-    let goldCategoryId:string="";
-    let dealerId:string="";
-    let itemCategoryId:string="";
-    forkJoin(this._service.getItemCategories(),this._service.getSubtypeDetails(),this._service.getDealerDetails()).subscribe(res=>{
+    forkJoin(this._service.getItemCategories()).subscribe(res=>{
       this.itemCategoryTable=res[0];
-      this.subTypeTableArray=res[1];
-      this.dealerTableArray=res[2];
+      this.isLoading = false;
       this.itemCategoryArray=this.itemCategoryTable.map(itemCategory=>itemCategory.itemCategoryName);
       this.itemCategoryArray=Array.from(new Set(this.itemCategoryArray));
-      this.goldCategoryArray=this.itemCategoryTable.map(goldCategory=>goldCategory.goldCategoryName).filter(goldCategory=>goldCategory!="Silver");
-      this.dealerNameArray=this.dealerTableArray.map(dealer=>dealer.dealerName);
-      this.goldCategoryType=this.goldCategoryArray[0];
-      this.dealerName=this.dealerNameArray[0];
-      this.itemCategory=this.itemCategoryArray[0];
-      itemCategoryId=this.itemCategoryTable.filter(item=>item.itemCategoryName==this.itemCategory).map(item=>item.itemCategoryId).pop();
-      dealerId=this.dealerTableArray.filter(dealer=>dealer.dealerName==this.dealerName).map(dealer=>dealer.dealerId).pop();
-      goldCategoryId=this.itemCategoryTable.filter(item=>item.itemCategoryName==this.itemCategory && item.goldCategoryName==this.goldCategoryType).map(item=>item.goldCategoryId).pop();
-    const param = {"itemCategoryId":itemCategoryId,"dealerId":dealerId,"goldCategoryId":goldCategoryId};
-    this._service.loadItems(param).subscribe(items=>{
-      this.itemsTableArray=items;      
-      this.itemsArray=items.map(item=>item.itemName);
-      this.selectedItem=this.itemsArray[0];
-      this.loadSubTypeId();
-
-    });
+      this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
+      this.newItemTabRef.nativeElement.classList.add('active');
     });
   }
-  
-    public loadSubTypeId(){
-      let subTypeIdfromItems = this.itemsTableArray.map(item=>item.itemsubtypeId);
-      this.subTypeArray = this.subTypeTableArray.filter(items=>
-        subTypeIdfromItems.indexOf(items.itemSubtypeId)!=-1).map(item=>item.itemSubtypeName);
+
+  private _filterItem(value: string): ItemModel[]  {
+    let filterValue = ''
+    if(value && typeof(value) === 'string'){
+      filterValue = value.toLowerCase();
+    } else if(typeof(value)==='number'){
+      this.isValid = true;
+    }
+    
+    if(typeof(value)==='string') {
+      this.isValid = this.items.filter(item => item.itemName === filterValue).length > 0;
+      return this.items.filter(item => item.itemName.toLowerCase().indexOf(filterValue) === 0);
+    } else {
+      return [];
+    }
+    
+  }
+
+  changeActiveTab(tabName){
+    if(tabName ==='newTab') {
+      this.newItemTabRef.nativeElement.classList.add('active');
+      this.existingItemTabRef.nativeElement.classList.remove('active');
+      this.exitingItemTab = false;
+    } else {
+      this.newItemTabRef.nativeElement.classList.remove('active');
+      this.existingItemTabRef.nativeElement.classList.add('active');
+      this.exitingItemTab = true;
+      this.itemCategory=this.itemCategoryTable[0].itemCategoryId;
+      this.loadDisplayItems('');
     }
 
+  }
+
+  addItem(event) {
+    if(!this.itemCategory || !this.itemName) {
+      this.toasterService.error('Error','Please Check the contents');
+    } else if(this.itemName.length< 4){
+      this.toasterService.error('Error','Please Input Item Name with More than 4 letter');
+      
+    } else {
+      const params = {'itemCategoryId':this.itemCategory,'itemName':this.itemName}
+      this.isLoading = true;
+      this._service.addItem(params).subscribe(result =>{
+        this.isLoading = false;
+        if(result){
+          this.toasterService.success('Info','Item Added Successfully');
+          this.itemName="";
+        }
+      });
+    }
+  }
+
+  deleteItem(itemId) {
+    if(!this.items.find(item => item.itemId === this.itemControl.value)) {
+      this.itemControl.patchValue('');
+      this.toasterService.error('Error','Enter valid Element');
+      return;
+    }
+    if(this.itemControl.value) {
+      const dialogRef = this.dialog.open(ConfirmationDialogComponent,{
+        width:'250px',
+        data:{
+          content: 'Are you sure you want to delete ' + this.getDisplayName(this.itemControl.value) +'?',
+          type: 'warn'
+        }
+      });
+      dialogRef.afterClosed().subscribe(confirmation => {
+        if(confirmation){
+          this.isLoading = true;
+        this._service.deleteItem({'itemId':''+ this.itemControl.value}).subscribe(result =>{
+          if(result){
+            this.isLoading = false;
+            this.toasterService.success('Info','Item Deleted');
+            this.loadDisplayItems('');
+          } else {
+            this.toasterService.error('Error','Item Not Delted!!!');
+          }
+        });
+      }
+      });
+    } else {
+      this.toasterService.error('Error','Please Select an Item');
+    }
+  }
+  
+  loadDisplayItems(keyword){
+    const param ={'itemCategoryId':this.itemCategory,'keyword':keyword}
+    this.isLoading = true;
+      this._service.loadItems(param).subscribe(items =>{
+        this.isLoading = false;
+        if(items.length > 0){
+          this.items = items;
+        } else {
+          this.items =[];
+          this.isValid = false;
+        }
+        this.itemControl.markAsTouched();
+        this.itemControl.patchValue('');
+      });
+  }
+
+  clearIfInvalid(){
+    if(!this.items.find(item => item.itemId === this.itemControl.value)) {
+      this.itemControl.patchValue('');
+    }
+  }
+
+  getDisplayName(itemId) {
+    if(!itemId) {
+      return "";
+    }
+    if(typeof(itemId)!=='number'){
+      return "";
+    }
+    return this.items.find(item => item.itemId === itemId).itemName;
+  }
 
 }

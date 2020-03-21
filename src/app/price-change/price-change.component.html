@@ -1,0 +1,21 @@
+<section class="container-fluid bg">
+  <section class="row justify-content-center">
+    <section class="col-12 col-sm-6 col-md-3">
+      <form class="form-container" [class.deleteColor]="exitingItemTab" name="addJewellForm">
+        <div class="form-group">
+          <label for="itemCategory">Item Category</label><br>
+          <select name="itemCategoryName"class="form-control poi" (change)="resetPrice()"name = "itemCategory" [(ngModel)]="itemCategory">
+              <option class="dropdown-item" value="{{item.itemCategoryId}}" *ngFor = "let item of itemCategoryTable">{{item.itemCategoryName}}</option>
+          </select>
+          <mat-form-field class="example-full-width">
+            <input matInput name="itemCategoryName" type="number" 
+            class="form-control" placeholder="Price / Gram"
+            aria-label="Price / Gram"  [(ngModel)]="itemPrice" required>
+          </mat-form-field>
+          <input style="margin-top: 12px;"name="itemCategoryName" value="Update" type="submit" class="btn btn-primary btn-block navColor" (click)="updatePrice($event)">
+      </div>
+      </form>
+  </section>
+</section>
+</section>
+<mat-spinner class="spinner"*ngIf="isLoading"></mat-spinner>

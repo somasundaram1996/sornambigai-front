@@ -1,1 +1,57 @@
-<h1>Inside Calculate Bill</h1>
+<div class="footer-align">
+    <table mat-table [dataSource]="dataSource? dataSource: []" class="mat-elevation-z8"> 
+            <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+        </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)"
+                        [aria-label]="checkboxLabel(row)">
+        </mat-checkbox>
+        </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+    <ng-container matColumnDef="itemId">
+        <th mat-header-cell *matHeaderCellDef> Item Id</th>
+        <td mat-cell *matCellDef="let transaction"> {{transaction.itemId}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+            <!-- Item Column -->
+    <ng-container matColumnDef="item">
+        <th mat-header-cell *matHeaderCellDef> Item </th>
+        <td mat-cell *matCellDef="let transaction"> {{transaction.item}} </td>
+        <td mat-footer-cell *matFooterCellDef> Total </td>
+    </ng-container>
+        
+            <!-- Cost / Gram Column -->
+    <ng-container matColumnDef="costPerGram">
+        <th mat-header-cell *matHeaderCellDef> Cost / Gram </th>
+        <td mat-cell *matCellDef="let transaction"> {{transaction.costPerGram | currency}} </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- Cost of Item Column-->
+    <ng-container  matColumnDef="cost">
+        <th mat-header-cell *matHeaderCellDef> Item Cost</th>
+        <td mat-cell *matCellDef="let transaction"> {{transaction.costPerGram * transaction.gramsPurchased}} </td>
+        <td mat-footer-cell *matFooterCellDef>{{getTotalCost()}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let transaction"><button (click)="emitDeletedId(transaction.itemId)"mat-icon-button><mat-icon>delete_outline</mat-icon></button></td>
+        <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>    
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+ </table>
+        <!-- <button style="float:right; margin-top:12px" mat-raised-button color="primary" (click) ="emitDeletedId()">Delete Item</button> -->
+</div>

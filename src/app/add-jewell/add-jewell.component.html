@@ -1,49 +1,50 @@
 <section class="container-fluid bg">
     <section class="row justify-content-center">
       <section class="col-12 col-sm-6 col-md-3">
-        <form class="form-container">
+        <form class="form-container" [class.deleteColor]="exitingItemTab" name="addJewellForm">
           <div class="form-group">
+            <ul class="nav nav-pills nav-fill poi">
+              <li class="nav-item">
+                <a #newItemTab class="nav-link active"  (click)="changeActiveTab('newTab')" aria-selected="true">Add Item</a>
+              </li>
+              <li class="nav-item">
+                <a #existingItemTab class="nav-link" (click)="changeActiveTab('existingTab')"aria-selected="false">Delete Item</a>
+              </li>
+            </ul>
+            <div *ngIf="!exitingItemTab">
             <label for="itemCategory">Item Category</label><br>
-            <select class="form-control poi" (change)="loadDisplayItems()" name = "itemCategory" [(ngModel)]="itemCategory">
-                <option class="dropdown-item" *ngFor = "let item of itemCategoryArray">{{item}}</option>
+            <select name="itemCategoryName"class="form-control poi" (change)="loadDisplayItems()" name = "itemCategory" [(ngModel)]="itemCategory">
+                <option class="dropdown-item" value="{{item.itemCategoryId}}" *ngFor = "let item of itemCategoryTable">{{item.itemCategoryName}}</option>
             </select>
+            <mat-form-field class="example-full-width">
+              <input matInput name="itemCategoryName" type="text" 
+              class="form-control" placeholder="Item Name"
+              aria-label="Item Name"  [(ngModel)]="itemName" required>
+            </mat-form-field>
+            <input style="margin-top: 12px;"name="itemCategoryName" value="Add Item" type="submit" class="btn btn-primary btn-block navColor" (click)="addItem($event)">
           </div>
-          <div  class="form-group">
-            <label>Item Type</label><br>
-            <ng-container *ngIf = "isGold; then goldCategory; else silverCategory" ></ng-container>
-            <ng-template #goldCategory>
-            <select class="form-control poi" (change)="loadDisplayItems()" name = "goldCategoryType" [(ngModel)]="goldCategoryType">        
-                    <option *ngFor = "let item of goldCategoryArray">{{item}}</option>           
-            </select>  
-            </ng-template>
-            <ng-template #silverCategory>
-                    <input type="text" class="form-control" disabled placeholder="No-Options">
-            </ng-template>         
-          </div>
-          <div class="form-group">
-            <label for="dealerName">Dealer Name</label><br>
-            <select class="form-control poi" (change)="loadDisplayItems()" name = "dealerName" [(ngModel)]="dealerName">
-                <option class="dropdown-item" *ngFor = "let item of dealerNameArray">{{item}}</option>
+          <div *ngIf="exitingItemTab">
+            <label for="itemCategory">Item Category</label><br>
+            <select name="existTabItemCategoryName" class="form-control poi" (change)="loadDisplayItems('')" name = "itemCategory" [(ngModel)]="itemCategory">
+                <option  class="dropdown-item"  value="{{item.itemCategoryId}}" *ngFor = "let item of itemCategoryTable">{{item.itemCategoryName}}</option>
             </select>
+            <mat-form-field class="example-full-width">
+              <input matInput
+                     placeholder="Item Name"
+                     aria-label="Item Name"
+                     [matAutocomplete]="auto"
+                     [formControl]="itemControl" required>
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="getDisplayName.bind(this)">
+                <mat-option *ngFor="let item of filteredItems | async" [value]="item.itemId">
+                  <span>{{item.itemName}}</span>
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+            <input style="margin-top: 12px;"name="itemCategoryName" value="Delete Item" type="submit" class="btn btn-primary btn-block navColor" (click)="deleteItem($event)">
           </div>
-          <div class="form-group">
-                <label for="items">Item</label><br>
-                <select class="form-control poi" name = "items" [(ngModel)]="selectedItem">
-                    <option class="dropdown-item" *ngFor = "let item of itemsArray">{{item}}</option>
-                </select>
-         </div>
-         <div *ngIf="!isItemsEmpty" class="form-group">
-          <label for="subType">Item Subtype</label><br>
-          <select class="form-control poi" (change)="loadDisplayItems()" name = "subType" [(ngModel)]="subType">
-              <option class="dropdown-item" *ngFor = "let item of subTypeArray">{{item}}</option>
-          </select>
         </div>
-         <div class="form-group">
-                <label for="quantity">Quantity</label><br>
-                <input type="number" name="quantity" class="form-control poi" [(ngModel)]="quantity">
-         </div>
-          <input type="submit" class="btn btn-primary btn-block navColor" (click)="onClickSubmit($event)">
         </form>
     </section>
 </section>
 </section>
+<mat-spinner class="spinner"*ngIf="isLoading"></mat-spinner>
